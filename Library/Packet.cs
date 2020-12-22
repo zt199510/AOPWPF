@@ -295,7 +295,7 @@ namespace Library
                     }
 
                 }
-
+                if (writeAction == null) continue;
                 writeAction(item.GetValue(ob), writer);
             }
 

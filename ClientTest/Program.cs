@@ -12,8 +12,9 @@ namespace ClientTest
        
         static void Main(string[] args)
         {
-
+           
             CEnvir.StartClientServer();
+            Console.ReadLine();
         }
     }
 }

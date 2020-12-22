@@ -21,12 +21,30 @@ namespace ClientTest
             AdditionalLogging = true;
             BeginReceive();
         }
+        public void Process(G.Disconnect p)
+        {
+          //  Disconnecting = true;
+        }
+        public void Process(G.Connected p)
+        {
+            Enqueue(new G.Connected());
+            ServerConnected = true;
 
+        }
+
+        public void Process(G.Ping p)
+        {
+            Enqueue(new G.Ping());
+        }
         public override void TryDisconnect()
         {
             Disconnect();
         }
-
+        public void Process(G.PingResponse p)
+        {
+            Ping = p.Ping;
+            Console.WriteLine($"当前Ping值{Ping}");
+        }
         public override void Disconnect()
         {
             base.Disconnect();
@@ -38,24 +56,12 @@ namespace ClientTest
             }
         }
 
-        public override void Process()
-        {
-            Enqueue(new G.Connected());
-            ServerConnected = true;
-        }
+ 
 
-        public override void SendDisconnect(Packet p)
-        {
-            base.SendDisconnect(p);
-        }
-
-      
-
-      
 
         public override void TrySendDisconnect(Packet p)
         {
-           
+            SendDisconnect(p);
         }
     }
 }

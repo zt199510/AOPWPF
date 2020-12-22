@@ -41,14 +41,35 @@ namespace ServerTest
 
         public override void Disconnect()
         {
+            if (!Connected) return;
+
             base.Disconnect();
+
+            SEnvir.Connections.Remove(this);
+            SEnvir.IPCount[IPAddress]--;
+            SEnvir.DBytesSent += TotalBytesSent;
+            SEnvir.DBytesReceived += TotalBytesReceived;
         }
 
         public override void Enqueue(Packet p)
         {
             base.Enqueue(p);
-        }
+            if (p == null || !p.ObserverPacket) return;
 
+            foreach (SConnection observer in Observers)
+                observer.Enqueue(p);
+        }
+        public void Process(G.Ping p)
+        {
+            
+
+            int ping = (int)(SEnvir.Now - PingTime).TotalMilliseconds / 2;
+            PingSent = false;
+            PingTime = SEnvir.Now + TimeSpan.FromSeconds(2);
+
+            Ping = ping;
+            Enqueue(new G.PingResponse { Ping = Ping, ObserverPacket = false });
+        }
         public override bool Equals(object obj)
         {
             return base.Equals(obj);
@@ -77,7 +98,6 @@ namespace ServerTest
                     if (SEnvir.Connections[i].IPAddress == IPAddress)
                         SEnvir.Connections[i].TryDisconnect();
 
-             
                 return;
             }
 
@@ -97,12 +117,33 @@ namespace ServerTest
 
         public override void TryDisconnect()
         {
-            throw new NotImplementedException();
+           
+          
+                if (!Disconnecting)
+                {
+                    Disconnecting = true;
+                    TimeOutTime = Time.Now.AddSeconds(10);
+                }
+
+                if (SEnvir.Now <= TimeOutTime) return;
+            
+
+            Disconnect();
         }
 
         public override void TrySendDisconnect(Packet p)
         {
-            throw new NotImplementedException();
+
+                if (!Disconnecting)
+                {
+                    base.SendDisconnect(p);
+
+                    TimeOutTime = Time.Now.AddSeconds(10);
+                }
+
+                if (SEnvir.Now <= TimeOutTime) return;
+
+            SendDisconnect(p);
         }
     }
 }

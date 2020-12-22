@@ -23,6 +23,13 @@ namespace ServerTest
         public static bool NetworkStarted { get; set; }
         public static bool Started { get; set; }
 
+        public static long DBytesSent, DBytesReceived;
+
+        public static long TotalBytesSent, TotalBytesReceived;
+
+        public static long DownloadSpeed, UploadSpeed;
+
+        public static int EMailsSent;
         public static Thread EnvirThread { get; private set; }
         public static void StartServer()
         {
