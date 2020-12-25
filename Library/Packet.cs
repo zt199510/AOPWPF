@@ -10,6 +10,10 @@ using System.Threading.Tasks;
 using System.Drawing;
 namespace Library
 {
+
+    /// <summary>
+    /// 数据处理
+    /// </summary>
     public abstract class Packet
     {
         private static readonly List<Type> Packets;

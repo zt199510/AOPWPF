@@ -34,6 +34,7 @@ namespace Library
         /// </summary>
         public int TotalBytesReceived { get; set; }
 
+
         public bool AdditionalLogging;
 
         /// <summary>
@@ -130,23 +131,23 @@ namespace Library
                 UpdateTimeOut();
 
                 byte[] rawBytes = result.AsyncState as byte[];
-
                 byte[] temp = _rawData;
                 _rawData = new byte[dataRead + temp.Length];
+                Console.WriteLine($"temp:{temp.Length},_rawData:{_rawData.Length}");
                 Buffer.BlockCopy(temp, 0, _rawData, 0, temp.Length);
                 Buffer.BlockCopy(rawBytes, 0, _rawData, temp.Length, dataRead);
                 Packet p;
                 while ((p = Packet.ReceivePacket(_rawData, out _rawData)) != null)
+                {
+                    Console.WriteLine(p.PacketType);
                     ReceiveList.Enqueue(p);
-
+                }
                 BeginReceive();
-
-
             }
             catch (Exception ex)
             {
-                if (AdditionalLogging)
-                    OnException(this, ex);
+              //  if (AdditionalLogging)
+                 //   OnException(this, ex);
                 Disconnecting = true;
 
             }
@@ -190,8 +191,8 @@ namespace Library
             }
             catch (Exception ex)
             {
-                if (AdditionalLogging)
-                    OnException(this, ex);
+               // if (AdditionalLogging)
+                  //  OnException(this, ex);
                 Disconnecting = true;
             }
         }
@@ -283,6 +284,7 @@ namespace Library
             }
         }
 
+       
         public virtual void Process()
         {
             if (TcpClient == null || !TcpClient.Connected)
@@ -369,8 +371,10 @@ namespace Library
             if (p == null) return;
             DateTime start = Time.Now;
             MethodInfo info;
+
+            //判断集合是否存在该方法如果存在跳过
             if (!PacketMethods.TryGetValue(p.PacketType, out info))
-                PacketMethods[p.PacketType] = info = GetType().GetMethod("Process", new[] { p.PacketType });
+                PacketMethods[p.PacketType] = info =  GetType().GetMethod("Process", new[] { p.PacketType });
             if (info == null)
                 throw new NotImplementedException($"未执行异常: 方式过程({p.PacketType}).");
 

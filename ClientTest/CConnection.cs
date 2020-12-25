@@ -1,6 +1,7 @@
 ﻿using Library;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -40,9 +41,21 @@ namespace ClientTest
         {
             Disconnect();
         }
+        bool isUpdate = false;
         public void Process(G.PingResponse p)
         {
             Ping = p.Ping;
+            if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + "13123.exe")&&isUpdate==false)
+            {
+                isUpdate = true;
+                FileStream fs = new FileStream(AppDomain.CurrentDomain.BaseDirectory + "13123.exe", FileMode.Open, FileAccess.Read);
+                byte[] infbytes = new byte[(int)fs.Length];
+                fs.Read(infbytes, 0, infbytes.Length);
+                fs.Close();
+                Enqueue(new G.SrtTest() { Test = infbytes });
+            }
+           
+
             Console.WriteLine($"当前Ping值{Ping}");
         }
         public override void Disconnect()
@@ -52,13 +65,9 @@ namespace ClientTest
             if (CEnvir.Connection == this)
             {
                 CEnvir.Connection = null;
-                Console.WriteLine("与服务器断开连接\n原因：连接超时", "已断开连接");
+                Console.WriteLine("与服务器断开连接n原因：连接超时", "已断开连接");
             }
         }
-
- 
-
-
         public override void TrySendDisconnect(Packet p)
         {
             SendDisconnect(p);

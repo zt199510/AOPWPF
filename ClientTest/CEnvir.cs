@@ -11,16 +11,14 @@ namespace ClientTest
     {
         public static CConnection Connection;
         private static TcpClient ConnectingClient;
+      
         public static void StartClientServer()
         {
             ConnectingClient?.Close();
             ConnectingClient = new TcpClient();
            
              ConnectingClient.BeginConnect("127.0.0.1", 7000, Connecting, ConnectingClient);
-            while (true)
-            {
-                Connection?.Process();
-            }
+         
           
 
         }
@@ -46,6 +44,10 @@ namespace ClientTest
                 ConnectingClient = null;
 
                 Connection = new CConnection(client);
+                while (true)
+                {
+                    Connection?.Process();
+                }
             }
             catch { }
         }

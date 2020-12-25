@@ -20,4 +20,8 @@ namespace Library.GeneralPackets
     {
         public DisconnectReason Reason { get; set; }
     }
+    public sealed class SrtTest : Packet
+    {
+        public byte[] Test { get; set; }
+    }
 }

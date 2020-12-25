@@ -81,7 +81,7 @@ namespace ServerTest
 
                             IPCount.TryGetValue(connection.IPAddress, out var ipCount);
                             IPCount[connection.IPAddress] = ipCount + 1;
-
+                            Console.WriteLine($"玩家{connection.IPAddress}进入游戏");
                             Connections.Add(connection);
                         }
                         long bytesSent = 0;
@@ -125,7 +125,7 @@ namespace ServerTest
                 TcpClient client = _userCountListener.EndAcceptTcpClient(result);
 
                 byte[] data = Encoding.ASCII.GetBytes(string.Format("c;/Zircon/{0}/;", Connections.Count));
-
+                
                 client.Client.BeginSend(data, 0, data.Length, SocketFlags.None, CountConnectionEnd, client);
             }
             catch { }
