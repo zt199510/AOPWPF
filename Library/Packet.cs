@@ -178,15 +178,12 @@ namespace Library
                 WriteObject(writer, this);
                 packet = stream.ToArray();
             }
-
             Length = packet.Length;
-
             using (MemoryStream stream = new MemoryStream())
             using (BinaryWriter writer = new BinaryWriter(stream))
             {
                 writer.Write(packet.Length + 4); //| 4Bytes: Packet Size | Data... |
                 writer.Write(packet);
-
                 return stream.ToArray();
             }
         }
@@ -200,10 +197,8 @@ namespace Library
         {
             //获取类的公共变量
             PropertyInfo[] properties = ob.GetType().GetProperties();
-
             foreach (PropertyInfo item in properties)
             {
-
                 if (item.GetCustomAttribute<IgnorePropertyPacket>() != null) continue;
                 Action<object, BinaryWriter> writeAction;
                 if(!TypeWrite.TryGetValue(item.PropertyType,out writeAction))
@@ -284,7 +279,6 @@ namespace Library
                                 {
                                     writer.Write(dictionary[key] != null);
                                     if (dictionary[key] == null) continue;
-
                                     WriteObject(writer, dictionary[key]);
                                 }
                                 else
@@ -336,10 +330,10 @@ namespace Library
                     //判断是否是泛型
                     else if (item.PropertyType.IsGenericType)
                     {
+
                         ///判断是否为集合
                         if (item.PropertyType.GetGenericTypeDefinition() == typeof(List<>))
                         {
-
                             IList list = (IList)item.GetValue(ob);
                             int count = reader.ReadInt32();
                             Type genType = item.PropertyType.GetGenericArguments()[0];

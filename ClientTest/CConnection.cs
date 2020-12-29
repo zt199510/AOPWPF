@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using G = Library.GeneralPackets;
 namespace ClientTest
 {
@@ -22,9 +24,24 @@ namespace ClientTest
             AdditionalLogging = true;
             BeginReceive();
         }
+       
+        public override void Disconnect()
+        {
+            base.Disconnect();
+
+            if (CEnvir.Connection == this)
+            {
+                CEnvir.Connection = null;
+                Console.WriteLine("与服务器断开连接n原因：连接超时", "已断开连接");
+            }
+        }
+        public override void TrySendDisconnect(Packet p)
+        {
+            SendDisconnect(p);
+        }
         public void Process(G.Disconnect p)
         {
-          //  Disconnecting = true;
+            //  Disconnecting = true;
         }
         public void Process(G.Connected p)
         {
@@ -45,32 +62,29 @@ namespace ClientTest
         public void Process(G.PingResponse p)
         {
             Ping = p.Ping;
-            if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + "13123.exe")&&isUpdate==false)
-            {
-                isUpdate = true;
-                FileStream fs = new FileStream(AppDomain.CurrentDomain.BaseDirectory + "13123.exe", FileMode.Open, FileAccess.Read);
-                byte[] infbytes = new byte[(int)fs.Length];
-                fs.Read(infbytes, 0, infbytes.Length);
-                fs.Close();
-                Enqueue(new G.SrtTest() { Test = infbytes });
-            }
-           
-
             Console.WriteLine($"当前Ping值{Ping}");
         }
-        public override void Disconnect()
-        {
-            base.Disconnect();
 
-            if (CEnvir.Connection == this)
-            {
-                CEnvir.Connection = null;
-                Console.WriteLine("与服务器断开连接n原因：连接超时", "已断开连接");
-            }
-        }
-        public override void TrySendDisconnect(Packet p)
+        /// <summary>
+        /// 验证客户端版本
+        /// </summary>
+        /// <param name="p"></param>
+        public void Process(G.CheckVersion p)
         {
-            SendDisconnect(p);
+            byte[] clientHash;
+            using (MD5 md5 = MD5.Create())
+            {
+                using (FileStream stream = File.OpenRead(Application.ExecutablePath))
+                    clientHash = md5.ComputeHash(stream);
+            }
+
+            Enqueue(new G.Version { ClientHash = clientHash });
+        }
+
+
+        public void Process(G.GoodVersion p)
+        {
+
         }
     }
 }

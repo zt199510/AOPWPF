@@ -10,7 +10,7 @@ using System.Reflection;
 using G = Library.GeneralPackets;
 namespace Library
 {
-   public abstract class BaseConnection
+    public abstract class BaseConnection
     {
         public static Dictionary<string, DiagnosticValue> Diagnostics = new Dictionary<string, DiagnosticValue>();
         public static Dictionary<Type, MethodInfo> PacketMethods = new Dictionary<Type, MethodInfo>();
@@ -49,7 +49,7 @@ namespace Library
         public TimeSpan Duration => Time.Now - TimeConnected;
 
 
-  
+
         /// <summary>
         /// 发送时间间隔
         /// </summary>
@@ -64,13 +64,14 @@ namespace Library
         public bool Disconnecting
         {
             get { return _disconnecting; }
-            set {
+            set
+            {
                 if (_disconnecting == value) return;
                 _disconnecting = value;
                 TimeOutTime = Time.Now.AddSeconds(2);
             }
         }
-        public ConcurrentQueue<Packet> ReceiveList = new ConcurrentQueue<Packet>(); 
+        public ConcurrentQueue<Packet> ReceiveList = new ConcurrentQueue<Packet>();
         public ConcurrentQueue<Packet> SendList = new ConcurrentQueue<Packet>();
 
         private byte[] _rawData = new byte[0];
@@ -89,7 +90,7 @@ namespace Library
         /// <summary>
         /// 开始接受数据
         /// </summary>
-       protected void BeginReceive()
+        protected void BeginReceive()
         {
             try
             {
@@ -146,12 +147,13 @@ namespace Library
             }
             catch (Exception ex)
             {
-              //  if (AdditionalLogging)
-                 //   OnException(this, ex);
+                if (this != null)
+                    if (AdditionalLogging)
+                        OnException(this, ex);
                 Disconnecting = true;
 
             }
-           
+
         }
 
         /// <summary>
@@ -171,8 +173,9 @@ namespace Library
             }
             catch (Exception ex)
             {
-                if (AdditionalLogging)
-                    OnException(this, ex);
+                if (this != null)
+                    if (AdditionalLogging)
+                        OnException(this, ex);
                 Disconnecting = true;
                 Sending = false;
             }
@@ -191,8 +194,8 @@ namespace Library
             }
             catch (Exception ex)
             {
-               // if (AdditionalLogging)
-                  //  OnException(this, ex);
+                // if (AdditionalLogging)
+                //  OnException(this, ex);
                 Disconnecting = true;
             }
         }
@@ -225,7 +228,7 @@ namespace Library
         }
 
         public abstract void TrySendDisconnect(Packet p);
-       
+
         /// <summary>
         /// 将发送数据转化为byte[]
         /// </summary>
@@ -284,7 +287,7 @@ namespace Library
             }
         }
 
-       
+
         public virtual void Process()
         {
             if (TcpClient == null || !TcpClient.Connected)
@@ -308,11 +311,11 @@ namespace Library
                 catch (Exception ex)
                 {
                     OnException(this, ex);
-                    throw ;
+                    throw;
                 }
             }
 
-            if(Time.Now >= TimeOutTime)
+            if (Time.Now >= TimeOutTime)
             {
                 if (!Disconnecting)
                     TrySendDisconnect(new G.Disconnect { Reason = DisconnectReason.TimedOut });
@@ -374,7 +377,7 @@ namespace Library
 
             //判断集合是否存在该方法如果存在跳过
             if (!PacketMethods.TryGetValue(p.PacketType, out info))
-                PacketMethods[p.PacketType] = info =  GetType().GetMethod("Process", new[] { p.PacketType });
+                PacketMethods[p.PacketType] = info = GetType().GetMethod("Process", new[] { p.PacketType });
             if (info == null)
                 throw new NotImplementedException($"未执行异常: 方式过程({p.PacketType}).");
 

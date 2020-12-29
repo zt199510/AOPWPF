@@ -89,14 +89,11 @@ namespace ServerTest
                         for (int i = Connections.Count - 1; i >= 0; i--)
                         {
                             if (i >= Connections.Count) break;
-
                             connection = Connections[i];
-
                             connection.Process();
                             bytesSent += connection.TotalBytesSent;
                             bytesReceived += connection.TotalBytesReceived;
                         }
-
                         long delay = (Time.Now - Now).Ticks / TimeSpan.TicksPerMillisecond;
                         if (delay > conDelay)
                             conDelay = delay;

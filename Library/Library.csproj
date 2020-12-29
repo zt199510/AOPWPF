@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="BaseConnection.cs" />
     <Compile Include="Enum.cs" />
+    <Compile Include="Functions.cs" />
     <Compile Include="GeneralPackets.cs" />
     <Compile Include="Packet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
