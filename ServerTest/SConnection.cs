@@ -20,6 +20,7 @@ namespace ServerTest
         Disconnected,
 
     }
+
     /// <summary>
     /// 用户类
     /// </summary>
@@ -165,7 +166,6 @@ namespace ServerTest
                 SendDisconnect(new G.Disconnect { Reason = DisconnectReason.WrongVersion });
                 return;
             }
-
             State = UserState.Login;
             Enqueue(new G.GoodVersion());
         }
